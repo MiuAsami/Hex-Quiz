@@ -21,11 +21,11 @@
     --correct-glow: rgba(46,204,138,0.18);
     --wrong: #ff5757;
     --wrong-glow: rgba(255,87,87,0.18);
+    --purple: #b47fff;
+    --purple-glow: rgba(180,127,255,0.18);
     --mono: 'Share Tech Mono', monospace;
     --display: 'Bebas Neue', sans-serif;
     --body: 'Barlow', sans-serif;
-
-    /* Responsive scale tokens */
     --card-pad: clamp(14px, 4vw, 28px);
     --hex-cell: clamp(30px, 8vw, 42px);
     --hex-font: clamp(18px, 5vw, 30px);
@@ -39,612 +39,240 @@
     --header-pad: clamp(10px, 3vw, 14px) clamp(14px, 5vw, 28px);
   }
 
-  html {
-    height: 100%;
-    /* Prevent iOS text size bump */
-    -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
-  }
+  html { height: 100%; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
   body {
-    min-height: 100%;
-    height: 100%;
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--body);
-    overflow-y: auto;
-    overflow-x: hidden;
-    /* Safe area for notched phones */
+    min-height: 100%; height: 100%;
+    background: var(--bg); color: var(--text); font-family: var(--body);
+    overflow-y: auto; overflow-x: hidden;
     padding-bottom: env(safe-area-inset-bottom);
   }
 
-  /* Subtle grid background */
   body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
     background-image:
       linear-gradient(rgba(61,158,255,0.025) 1px, transparent 1px),
       linear-gradient(90deg, rgba(61,158,255,0.025) 1px, transparent 1px);
     background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
   }
 
   #app {
-    position: relative;
-    z-index: 1;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: clamp(70px, 14vw, 80px) 12px clamp(70px, 14vw, 80px);
+    position: relative; z-index: 1; min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: clamp(70px,14vw,80px) 12px clamp(70px,14vw,80px);
   }
 
-  /* ── HEADER ── */
+  /* HEADER */
   header {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
     padding: var(--header-pad);
+    padding-top: calc(env(safe-area-inset-top) + clamp(10px,3vw,14px));
     border-bottom: 1px solid var(--border);
     background: rgba(8,11,15,0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    z-index: 100;
-    /* Respect status bar on notched phones */
-    padding-top: calc(env(safe-area-inset-top) + clamp(10px, 3vw, 14px));
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   }
-
-  .logo {
-    font-family: var(--display);
-    font-size: clamp(18px, 5vw, 22px);
-    letter-spacing: 3px;
-    color: var(--accent);
-    text-shadow: 0 0 20px var(--accent-glow);
-  }
+  .logo { font-family: var(--display); font-size: clamp(18px,5vw,22px); letter-spacing: 3px; color: var(--accent); text-shadow: 0 0 20px var(--accent-glow); }
   .logo span { color: var(--text-dim); }
-
-  .streak-badge {
-    font-family: var(--mono);
-    font-size: clamp(10px, 2.5vw, 12px);
-    color: var(--text-dim);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .streak-badge b {
-    font-size: clamp(15px, 4vw, 18px);
-    color: var(--correct);
-    text-shadow: 0 0 12px var(--correct-glow);
-    transition: transform 0.2s;
-  }
+  .header-right { display: flex; align-items: center; gap: 14px; }
+  .streak-badge { font-family: var(--mono); font-size: clamp(10px,2.5vw,12px); color: var(--text-dim); display: flex; align-items: center; gap: 6px; }
+  .streak-badge b { font-size: clamp(15px,4vw,18px); color: var(--correct); text-shadow: 0 0 12px var(--correct-glow); }
   .streak-badge b.pop { animation: pop 0.3s ease; }
-  @keyframes pop {
-    0%   { transform: scale(1); }
-    50%  { transform: scale(1.5); }
-    100% { transform: scale(1); }
-  }
+  @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.5)} 100%{transform:scale(1)} }
 
-  /* ── MODE BAR ── */
+  /* TOGGLE */
+  .toggle-wrap { display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; touch-action: manipulation; }
+  .toggle-label { font-family: var(--mono); font-size: clamp(9px,2.2vw,11px); color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
+  .toggle-track { position: relative; width: 34px; height: 19px; border-radius: 10px; background: var(--border-lit); border: 1px solid var(--border-lit); transition: background 0.25s, border-color 0.25s; flex-shrink: 0; }
+  .toggle-thumb { position: absolute; top: 2px; left: 2px; width: 13px; height: 13px; border-radius: 50%; background: var(--text-dim); transition: transform 0.25s, background 0.25s; }
+  .toggle-wrap.on .toggle-track { background: var(--accent-glow); border-color: var(--accent); }
+  .toggle-wrap.on .toggle-thumb { transform: translateX(15px); background: var(--accent); box-shadow: 0 0 8px rgba(61,158,255,0.5); }
+
+  /* MODE BAR */
   .mode-bar {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: clamp(5px, 1.5vw, 8px);
-    padding: clamp(8px, 2.5vw, 14px) clamp(10px, 4vw, 28px);
-    /* Safe area bottom padding */
-    padding-bottom: calc(env(safe-area-inset-bottom) + clamp(8px, 2.5vw, 14px));
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    display: flex; flex-direction: column; align-items: center;
+    gap: clamp(5px,1.2vw,8px);
+    padding: clamp(8px,2.5vw,12px) clamp(10px,4vw,28px);
+    padding-bottom: calc(env(safe-area-inset-bottom) + clamp(8px,2.5vw,12px));
     border-top: 1px solid var(--border);
     background: rgba(8,11,15,0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    z-index: 100;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   }
-  .mode-label {
-    font-family: var(--mono);
-    font-size: clamp(9px, 2.2vw, 11px);
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-right: 4px;
-  }
+  .mode-bar-row { display: flex; align-items: center; justify-content: center; gap: clamp(5px,1.5vw,8px); width: 100%; }
+  .mode-bar-row + .mode-bar-row { border-top: 1px solid var(--border); padding-top: clamp(5px,1.2vw,8px); }
+  .mode-label { font-family: var(--mono); font-size: clamp(9px,2.2vw,11px); color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; margin-right: 2px; white-space: nowrap; }
   .mode-btn {
-    width: var(--mode-btn-size);
-    height: var(--mode-btn-size);
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text-dim);
-    font-family: var(--mono);
-    font-size: var(--mode-font);
-    cursor: pointer;
-    transition: all 0.2s;
+    width: var(--mode-btn-size); height: var(--mode-btn-size);
+    border-radius: 6px; border: 1px solid var(--border); background: var(--surface);
+    color: var(--text-dim); font-family: var(--mono); font-size: var(--mode-font);
+    cursor: pointer; transition: all 0.2s;
     display: flex; align-items: center; justify-content: center;
-    /* Larger touch target */
     touch-action: manipulation;
   }
-  .mode-btn:hover, .mode-btn:focus-visible {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: var(--accent-glow);
+  .mode-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+  .mode-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); box-shadow: 0 0 16px var(--accent-glow); }
+  .guess-btn {
+    height: var(--mode-btn-size); padding: 0 clamp(10px,3vw,16px);
+    border-radius: 6px; border: 1px solid var(--border); background: var(--surface);
+    color: var(--text-dim); font-family: var(--mono); font-size: var(--mode-font);
+    cursor: pointer; transition: all 0.2s; letter-spacing: 1px;
+    display: flex; align-items: center; justify-content: center;
+    touch-action: manipulation;
   }
-  .mode-btn.active {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: var(--accent-glow);
-    box-shadow: 0 0 16px var(--accent-glow);
-  }
+  .guess-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+  .guess-btn.active-hex  { border-color: var(--accent);  color: var(--accent);  background: var(--accent-glow);  box-shadow: 0 0 16px var(--accent-glow); }
+  .guess-btn.active-name { border-color: var(--purple);  color: var(--purple);  background: var(--purple-glow);  box-shadow: 0 0 16px var(--purple-glow); }
 
-  /* ── GAME CARD ── */
+  /* GAME CARD */
   .game-card {
-    width: 100%;
-    max-width: 480px;
-    border: 1px solid var(--border);
-    border-radius: clamp(10px, 3vw, 16px);
-    background: var(--surface);
-    overflow: hidden;
+    width: 100%; max-width: 480px;
+    border: 1px solid var(--border); border-radius: clamp(10px,3vw,16px);
+    background: var(--surface); overflow: hidden;
     box-shadow: 0 24px 64px rgba(0,0,0,0.5);
     animation: slideIn 0.35s cubic-bezier(0.22,1,0.36,1);
   }
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes slideIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  .swatch { height: var(--swatch-h); position: relative; transition: background-color 0.4s ease; overflow: hidden; }
+  .swatch::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.4) 100%); }
+  .card-body { padding: var(--card-pad); }
+  .color-name { font-family: var(--display); font-size: var(--name-font); letter-spacing: 2px; color: var(--text); margin-bottom: 4px; line-height: 1.1; word-break: break-word; min-height: 1.2em; }
+  .color-index { font-family: var(--mono); font-size: clamp(9px,2.2vw,11px); color: var(--text-dim); margin-bottom: clamp(14px,4vw,24px); cursor: pointer; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; }
 
-  /* Color swatch */
-  .swatch {
-    height: var(--swatch-h);
-    position: relative;
-    transition: background-color 0.4s ease;
-    overflow: hidden;
-  }
-  .swatch::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.4) 100%);
-  }
-
-
-  /* Card body */
-  .card-body {
-    padding: var(--card-pad);
-  }
-  .color-name {
-    font-family: var(--display);
-    font-size: var(--name-font);
-    letter-spacing: 2px;
-    color: var(--text);
-    margin-bottom: 4px;
-    line-height: 1.1;
-    /* Prevent overflow on long names */
-    word-break: break-word;
-  }
-  .color-index {
-    font-family: var(--mono);
-    font-size: clamp(9px, 2.2vw, 11px);
-    color: var(--text-dim);
-    margin-bottom: clamp(14px, 4vw, 24px);
-  }
-
-  /* ── HEX DISPLAY ── */
-  .hex-display {
-    display: flex;
-    align-items: center;
-    margin-bottom: clamp(14px, 4vw, 24px);
-    /* Prevent overflow, allow shrink */
-    min-width: 0;
-    overflow: visible;
-  }
-  .hex-hash {
-    font-family: var(--mono);
-    font-size: var(--hash-font);
-    color: var(--text-dim);
-    margin-right: clamp(2px, 0.8vw, 4px);
-    line-height: 1;
-    flex-shrink: 0;
-  }
-  .hex-chars {
-    display: flex;
-    gap: clamp(2px, 1vw, 4px);
-    align-items: center;
-    flex-wrap: nowrap;
-    min-width: 0;
-  }
+  /* HEX DISPLAY */
+  .hex-display { display: flex; align-items: center; margin-bottom: clamp(14px,4vw,24px); min-width: 0; }
+  .hex-hash { font-family: var(--mono); font-size: var(--hash-font); color: var(--text-dim); margin-right: clamp(2px,0.8vw,4px); line-height: 1; flex-shrink: 0; }
+  .hex-chars { display: flex; gap: clamp(2px,1vw,4px); align-items: center; flex-wrap: nowrap; }
   .hex-char {
-    width: var(--hex-cell);
-    height: calc(var(--hex-cell) * 1.24);
+    width: var(--hex-cell); height: calc(var(--hex-cell) * 1.24);
     display: flex; align-items: center; justify-content: center;
-    font-family: var(--mono);
-    font-size: var(--hex-font);
-    font-weight: bold;
-    color: var(--text);
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
-    border-radius: clamp(4px, 1.2vw, 6px);
-    line-height: 1;
-    text-transform: uppercase;
-    transition: border-color 0.2s, color 0.2s;
-    flex-shrink: 0;
-  }
-  .hex-char.known {
-    color: var(--text);
-    border-color: var(--border);
+    font-family: var(--mono); font-size: var(--hex-font); font-weight: bold;
+    color: var(--text); background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border); border-radius: clamp(4px,1.2vw,6px);
+    line-height: 1; text-transform: uppercase; flex-shrink: 0;
   }
   .hex-input {
-    width: var(--hex-cell);
-    height: calc(var(--hex-cell) * 1.24);
-    background: rgba(61,158,255,0.07);
-    border: 1.5px solid var(--accent);
-    border-radius: clamp(4px, 1.2vw, 6px);
-    font-family: var(--mono);
-    font-size: var(--hex-font);
-    font-weight: bold;
-    color: var(--accent);
-    text-align: center;
-    text-transform: uppercase;
-    outline: none;
-    caret-color: transparent;
-    transition: all 0.15s;
+    width: var(--hex-cell); height: calc(var(--hex-cell) * 1.24);
+    background: rgba(61,158,255,0.07); border: 1.5px solid var(--accent);
+    border-radius: clamp(4px,1.2vw,6px);
+    font-family: var(--mono); font-size: max(16px, var(--hex-font)); font-weight: bold;
+    color: var(--accent); text-align: center; text-transform: uppercase;
+    outline: none; caret-color: transparent;
     box-shadow: 0 0 12px rgba(61,158,255,0.12);
-    padding: 0;
-    flex-shrink: 0;
-    /* Prevent mobile zoom on focus (font ≥ 16px visually fine via scaling) */
-    font-size: max(16px, var(--hex-font));
-    touch-action: manipulation;
-    -webkit-appearance: none;
-    appearance: none;
+    padding: 0; flex-shrink: 0; transition: all 0.15s;
+    touch-action: manipulation; -webkit-appearance: none; appearance: none;
   }
-  .hex-input:focus {
-    border-color: #6eb8ff;
-    box-shadow: 0 0 0 3px rgba(61,158,255,0.18);
-  }
-  .hex-input.correct {
-    background: var(--correct-glow);
-    border-color: var(--correct);
-    color: var(--correct);
-    box-shadow: 0 0 12px var(--correct-glow);
-  }
-  .hex-input.wrong {
-    background: var(--wrong-glow);
-    border-color: var(--wrong);
-    color: var(--wrong);
-    box-shadow: 0 0 12px var(--wrong-glow);
-  }
-  .hex-input.revealed {
-    background: rgba(255,255,255,0.05);
-    border-color: var(--border-lit);
-    color: var(--text);
-  }
+  .hex-input:focus   { border-color: #6eb8ff; box-shadow: 0 0 0 3px rgba(61,158,255,0.18); }
+  .hex-input.correct { background: var(--correct-glow); border-color: var(--correct); color: var(--correct); box-shadow: 0 0 12px var(--correct-glow); }
+  .hex-input.wrong   { background: var(--wrong-glow);   border-color: var(--wrong);   color: var(--wrong);   box-shadow: 0 0 12px var(--wrong-glow); }
+  .hex-input.revealed{ background: rgba(255,255,255,0.05); border-color: var(--border-lit); color: var(--text); }
 
-  /* Feedback strip */
-  .feedback {
-    min-height: 28px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--mono);
-    font-size: clamp(10px, 2.5vw, 12px);
-    margin-bottom: clamp(10px, 3vw, 16px);
-    opacity: 0;
-    transform: translateY(4px);
-    transition: opacity 0.2s, transform 0.2s;
-    word-break: break-all;
+  /* NAME MODE */
+  .name-guess-wrap { margin-bottom: clamp(14px,4vw,24px); }
+  .name-parts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .name-visible { font-family: var(--display); font-size: var(--name-font); letter-spacing: 2px; color: var(--text); line-height: 1.1; }
+  .name-input {
+    font-family: var(--mono); font-size: clamp(14px,3.5vw,18px);
+    background: var(--purple-glow); border: 1.5px solid var(--purple);
+    border-radius: 8px; color: var(--purple); padding: 6px 12px;
+    outline: none; caret-color: var(--purple);
+    box-shadow: 0 0 12px rgba(180,127,255,0.1);
+    min-width: 120px; max-width: 100%;
+    touch-action: manipulation; -webkit-appearance: none; appearance: none;
+    transition: all 0.15s;
   }
+  .name-input:focus   { border-color: #d4aaff; box-shadow: 0 0 0 3px var(--purple-glow); }
+  .name-input.correct { background: var(--correct-glow); border-color: var(--correct); color: var(--correct); box-shadow: 0 0 12px var(--correct-glow); }
+  .name-input.wrong   { background: var(--wrong-glow);   border-color: var(--wrong);   color: var(--wrong);   box-shadow: 0 0 12px var(--wrong-glow); }
+  .name-input.revealed{ background: rgba(255,255,255,0.05); border-color: var(--border-lit); color: var(--text); font-family: var(--display); font-size: var(--name-font); letter-spacing: 2px; }
+  .hex-full { display: flex; align-items: center; margin-bottom: clamp(14px,4vw,24px); opacity: 0.5; }
+  .hex-full-hash  { font-family: var(--mono); font-size: var(--hash-font); color: var(--text-dim); margin-right: 4px; line-height: 1; }
+  .hex-full-value { font-family: var(--mono); font-size: var(--hash-font); color: var(--text); letter-spacing: 2px; line-height: 1; font-weight: bold; }
+
+  /* FEEDBACK */
+  .feedback { min-height: 28px; display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: clamp(10px,2.5vw,12px); margin-bottom: clamp(10px,3vw,16px); opacity: 0; transform: translateY(4px); transition: opacity 0.2s, transform 0.2s; word-break: break-all; }
   .feedback.show { opacity: 1; transform: translateY(0); }
   .feedback.correct-msg { color: var(--correct); }
   .feedback.wrong-msg   { color: var(--wrong); }
-  .feedback-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: currentColor;
-    flex-shrink: 0;
-  }
+  .feedback-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
 
-  /* Buttons row */
-  .btn-row {
-    display: flex;
-    gap: clamp(6px, 2vw, 10px);
-  }
+  /* BUTTONS */
+  .btn-row { display: flex; gap: clamp(6px,2vw,10px); }
   .btn {
-    flex: 1;
-    height: var(--btn-h);
-    border-radius: clamp(6px, 2vw, 8px);
-    border: none;
-    font-family: var(--mono);
-    font-size: var(--btn-font);
-    letter-spacing: clamp(1px, 0.5vw, 2px);
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.18s;
-    position: relative;
-    overflow: hidden;
-    touch-action: manipulation;
+    flex: 1; height: var(--btn-h); border-radius: clamp(6px,2vw,8px); border: none;
+    font-family: var(--mono); font-size: var(--btn-font); letter-spacing: clamp(1px,0.5vw,2px);
+    text-transform: uppercase; cursor: pointer; transition: all 0.18s;
+    position: relative; overflow: hidden; touch-action: manipulation;
   }
-  .btn::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(255,255,255,0);
-    transition: background 0.15s;
-  }
+  .btn::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0); transition: background 0.15s; }
   .btn:hover::after  { background: rgba(255,255,255,0.06); }
   .btn:active::after { background: rgba(255,255,255,0.12); }
-  .btn-enter {
-    background: var(--accent);
-    color: #000;
-    font-weight: bold;
-    box-shadow: 0 0 20px rgba(61,158,255,0.3);
-  }
+  .btn-enter { background: var(--accent);  color: #000; font-weight: bold; box-shadow: 0 0 20px rgba(61,158,255,0.3); }
   .btn-enter:hover { box-shadow: 0 0 28px rgba(61,158,255,0.45); }
-  .btn-enter:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-  .btn-next {
-    background: var(--correct);
-    color: #000;
-    font-weight: bold;
-    box-shadow: 0 0 20px var(--correct-glow);
-  }
+  .btn-next  { background: var(--correct); color: #000; font-weight: bold; box-shadow: 0 0 20px var(--correct-glow); }
   .btn-next:hover { box-shadow: 0 0 28px rgba(46,204,138,0.4); }
-  .btn-skip {
-    background: transparent;
-    border: 1px solid var(--border-lit);
-    color: var(--text-dim);
-    flex: 0 0 auto;
-    width: clamp(60px, 18vw, 80px);
-  }
+  .btn-skip  { background: transparent; border: 1px solid var(--border-lit); color: var(--text-dim); flex: 0 0 auto; width: clamp(60px,18vw,80px); }
   .btn-skip:hover { border-color: var(--text-dim); color: var(--text); }
 
-  /* Instructions hint */
-  .hint {
-    text-align: center;
-    font-size: clamp(9px, 2.2vw, 11px);
-    color: var(--text-dim);
-    font-family: var(--mono);
-    margin-top: clamp(8px, 2.5vw, 14px);
-    letter-spacing: 1px;
-  }
-  .hint kbd {
-    background: var(--border);
-    border: 1px solid var(--border-lit);
-    border-radius: 3px;
-    padding: 1px 5px;
-    font-family: var(--mono);
-    font-size: clamp(8px, 2vw, 10px);
-  }
+  /* HINT */
+  .hint { text-align: center; font-size: clamp(9px,2.2vw,11px); color: var(--text-dim); font-family: var(--mono); margin-top: clamp(8px,2.5vw,14px); letter-spacing: 1px; }
+  .hint kbd { background: var(--border); border: 1px solid var(--border-lit); border-radius: 3px; padding: 1px 5px; font-family: var(--mono); font-size: clamp(8px,2vw,10px); }
 
-  /* ── AUTO-ADVANCE TOGGLE ── */
-  .toggle-wrap {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    user-select: none;
+  /* COLOR LIST MODAL */
+  .modal-backdrop {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center; padding: 12px;
+    opacity: 0; pointer-events: none; transition: opacity 0.22s ease;
   }
-  .toggle-label {
-    font-family: var(--mono);
-    font-size: clamp(9px, 2.2vw, 11px);
-    color: var(--text-dim);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    white-space: nowrap;
+  .modal-backdrop.open { opacity: 1; pointer-events: all; }
+  .modal {
+    width: 100%; max-width: 520px; max-height: 82vh;
+    background: var(--surface); border: 1px solid var(--border-lit);
+    border-radius: clamp(10px,3vw,16px); overflow: hidden;
+    display: flex; flex-direction: column;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+    transform: translateY(16px); transition: transform 0.22s cubic-bezier(0.22,1,0.36,1);
   }
-  .toggle-track {
-    position: relative;
-    width: 36px;
-    height: 20px;
-    border-radius: 10px;
-    background: var(--border-lit);
-    border: 1px solid var(--border-lit);
-    transition: background 0.25s, border-color 0.25s;
-    flex-shrink: 0;
-  }
-  .toggle-thumb {
-    position: absolute;
-    top: 2px; left: 2px;
-    width: 14px; height: 14px;
-    border-radius: 50%;
-    background: var(--text-dim);
-    transition: transform 0.25s, background 0.25s;
-  }
-  .toggle-wrap.on .toggle-track {
-    background: var(--accent-glow);
-    border-color: var(--accent);
-  }
-  .toggle-wrap.on .toggle-thumb {
-    transform: translateX(16px);
-    background: var(--accent);
-    box-shadow: 0 0 8px rgba(61,158,255,0.5);
-  }
-  @media (min-width: 600px) {
-    :root {
-      --swatch-h: 180px;
-      --hex-cell: 42px;
-      --hex-font: 30px;
-    }
-  }
+  .modal-backdrop.open .modal { transform: translateY(0); }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .modal-title { font-family: var(--display); font-size: clamp(16px,4vw,20px); letter-spacing: 2px; color: var(--text); }
+  .modal-close { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--border-lit); background: transparent; color: var(--text-dim); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; touch-action: manipulation; }
+  .modal-close:hover { border-color: var(--wrong); color: var(--wrong); }
+  .modal-stats { display: flex; gap: 16px; padding: 10px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0; flex-wrap: wrap; }
+  .modal-stat { font-family: var(--mono); font-size: 11px; display: flex; align-items: center; gap: 6px; color: var(--text-dim); }
+  .stat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .stat-dot.unseen  { background: var(--border-lit); }
+  .stat-dot.correct { background: var(--correct); }
+  .stat-dot.wrong   { background: var(--wrong); }
+  .modal-list { overflow-y: auto; flex: 1; padding: 8px 12px 12px; overscroll-behavior: contain; }
+  .modal-list::-webkit-scrollbar { width: 4px; }
+  .modal-list::-webkit-scrollbar-thumb { background: var(--border-lit); border-radius: 2px; }
+  .color-row { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 6px; border: 1px solid transparent; transition: background 0.12s; }
+  .color-row:hover { background: rgba(255,255,255,0.03); }
+  .color-row.current-row { background: rgba(61,158,255,0.07); border-color: rgba(61,158,255,0.2); }
+  .row-swatch { width: 28px; height: 28px; border-radius: 5px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.08); }
+  .row-info { flex: 1; min-width: 0; }
+  .row-name { font-family: var(--mono); font-size: 11px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row-hex  { font-family: var(--mono); font-size: 10px; color: var(--text-dim); margin-top: 1px; }
+  .row-badge { font-family: var(--mono); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; flex-shrink: 0; }
+  .row-badge.correct { background: var(--correct-glow); color: var(--correct); border: 1px solid var(--correct); }
+  .row-badge.wrong   { background: var(--wrong-glow);   color: var(--wrong);   border: 1px solid var(--wrong); }
+  .row-badge.current { background: var(--accent-glow);  color: var(--accent);  border: 1px solid var(--accent); }
+  .row-badge.unseen  { display: none; }
+  .row-num { font-family: var(--mono); font-size: 10px; color: var(--text-dim); width: 24px; text-align: right; flex-shrink: 0; }
 
-  /* ── Very small phones (≤ 360px) ── */
+  /* RESPONSIVE */
+  @media (min-width: 600px) { :root { --swatch-h: 180px; --hex-cell: 42px; --hex-font: 30px; } }
   @media (max-width: 360px) {
-    :root {
-      --hex-cell: 28px;
-      --hex-font: 16px;
-      --hash-font: 18px;
-      --swatch-h: 100px;
-    }
+    :root { --hex-cell: 28px; --hex-font: 16px; --hash-font: 18px; --swatch-h: 100px; }
     .hex-chars { gap: 2px; }
-    .hex-display { margin-bottom: 10px; }
   }
-
-  /* ── Landscape mobile ── */
   @media (max-height: 500px) and (orientation: landscape) {
     :root { --swatch-h: 80px; }
     .game-card { display: flex; flex-direction: row; max-width: 700px; }
     .swatch { width: 140px; height: auto; flex-shrink: 0; }
     .card-body { flex: 1; padding: 14px 16px; }
-    .color-index { margin-bottom: 10px; }
-  }
-  /* ── COLOR LIST MODAL ── */
-  .modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.72);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    z-index: 200;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.22s ease;
-  }
-  .modal-backdrop.open {
-    opacity: 1;
-    pointer-events: all;
-  }
-  .modal {
-    width: 100%;
-    max-width: 520px;
-    max-height: 82vh;
-    background: var(--surface);
-    border: 1px solid var(--border-lit);
-    border-radius: clamp(10px, 3vw, 16px);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 32px 80px rgba(0,0,0,0.7);
-    transform: translateY(16px);
-    transition: transform 0.22s cubic-bezier(0.22,1,0.36,1);
-  }
-  .modal-backdrop.open .modal {
-    transform: translateY(0);
-  }
-  .modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .modal-title {
-    font-family: var(--display);
-    font-size: clamp(16px, 4vw, 20px);
-    letter-spacing: 2px;
-    color: var(--text);
-  }
-  .modal-close {
-    width: 30px; height: 30px;
-    border-radius: 6px;
-    border: 1px solid var(--border-lit);
-    background: transparent;
-    color: var(--text-dim);
-    font-size: 16px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s;
-    line-height: 1;
-    touch-action: manipulation;
-  }
-  .modal-close:hover { border-color: var(--wrong); color: var(--wrong); }
-  .modal-stats {
-    display: flex;
-    gap: 16px;
-    padding: 10px 20px;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .modal-stat {
-    font-family: var(--mono);
-    font-size: 11px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--text-dim);
-  }
-  .stat-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .stat-dot.unseen  { background: var(--border-lit); }
-  .stat-dot.correct { background: var(--correct); }
-  .stat-dot.wrong   { background: var(--wrong); }
-  .modal-list {
-    overflow-y: auto;
-    flex: 1;
-    padding: 8px 12px 12px;
-    overscroll-behavior: contain;
-  }
-  .modal-list::-webkit-scrollbar { width: 4px; }
-  .modal-list::-webkit-scrollbar-track { background: transparent; }
-  .modal-list::-webkit-scrollbar-thumb { background: var(--border-lit); border-radius: 2px; }
-  .color-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 6px 8px;
-    border-radius: 6px;
-    transition: background 0.12s;
-  }
-  .color-row:hover { background: rgba(255,255,255,0.03); }
-  .color-row.current-row { background: rgba(61,158,255,0.07); border: 1px solid rgba(61,158,255,0.2); }
-  .row-swatch {
-    width: 28px; height: 28px;
-    border-radius: 5px;
-    flex-shrink: 0;
-    border: 1px solid rgba(255,255,255,0.08);
-  }
-  .row-info {
-    flex: 1;
-    min-width: 0;
-  }
-  .row-name {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .row-hex {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text-dim);
-    margin-top: 1px;
-  }
-  .row-badge {
-    font-family: var(--mono);
-    font-size: 9px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 2px 7px;
-    border-radius: 4px;
-    flex-shrink: 0;
-  }
-  .row-badge.correct { background: var(--correct-glow); color: var(--correct); border: 1px solid var(--correct); }
-  .row-badge.wrong   { background: var(--wrong-glow);   color: var(--wrong);   border: 1px solid var(--wrong); }
-  .row-badge.current { background: var(--accent-glow);  color: var(--accent);  border: 1px solid var(--accent); }
-  .row-badge.unseen  { display: none; }
-  .row-num {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text-dim);
-    width: 24px;
-    text-align: right;
-    flex-shrink: 0;
   }
 </style>
 </head>
@@ -652,48 +280,79 @@
 
 <header>
   <div class="logo">HEX<span>QUIZ</span></div>
-  <div class="toggle-wrap on" id="autoToggle" onclick="toggleAutoAdvance()" title="Auto-advance after correct answer">
-    <span class="toggle-label">AUTO</span>
-    <div class="toggle-track"><div class="toggle-thumb"></div></div>
+  <div class="header-right">
+    <div class="toggle-wrap on" id="autoToggle" onclick="toggleAutoAdvance()" title="Auto-advance after correct">
+      <span class="toggle-label">AUTO</span>
+      <div class="toggle-track"><div class="toggle-thumb"></div></div>
+    </div>
+    <div class="streak-badge">STREAK <b id="streak">0</b></div>
   </div>
-  <div class="streak-badge">STREAK <b id="streak">0</b></div>
 </header>
 
 <div id="app">
-  <div class="game-card" id="gameCard">
+  <div class="game-card">
     <div class="swatch" id="swatch"></div>
     <div class="card-body">
       <div class="color-name" id="colorName">—</div>
-      <div class="color-index" id="colorIndex" onclick="openColorList()"
-        style="cursor:pointer; text-decoration:underline; text-decoration-style:dotted; text-underline-offset:3px;"
-        title="View all colors">Color 0 of 103 ↗</div>
-      <div class="hex-display">
+      <div class="color-index" id="colorIndex" onclick="openColorList()" title="View all colors">Color 0 of 103 ↗</div>
+      <div class="hex-display" id="hexDisplay">
         <div class="hex-hash">#</div>
         <div class="hex-chars" id="hexChars"></div>
       </div>
+      <div id="nameGuessWrap" class="name-guess-wrap" style="display:none;"></div>
       <div class="feedback" id="feedback">
         <div class="feedback-dot"></div>
         <span id="feedbackText"></span>
       </div>
       <div class="btn-row" id="btnRow">
-        <button class="btn btn-skip" id="btnSkip" onclick="skipRound()">SKIP</button>
-        <button class="btn btn-enter" id="btnEnter" onclick="checkAnswer()">ENTER</button>
+        <button class="btn btn-skip" onclick="skipRound()">SKIP</button>
+        <button class="btn btn-enter" onclick="checkAnswer()">ENTER</button>
       </div>
     </div>
   </div>
   <div class="hint" id="hintText">
-    Type in the <kbd>_</kbd> blanks · <kbd>Enter</kbd> to submit
+    Type in the <kbd>_</kbd> blanks &middot; <kbd>Enter</kbd> to submit
   </div>
 </div>
 
 <div class="mode-bar">
-  <span class="mode-label">Missing:</span>
-  <button class="mode-btn active" id="mode-1" onclick="setMode(1)">1</button>
-  <button class="mode-btn" id="mode-2" onclick="setMode(2)">2</button>
-  <button class="mode-btn" id="mode-3" onclick="setMode(3)">3</button>
-  <button class="mode-btn" id="mode-4" onclick="setMode(4)">4</button>
-  <button class="mode-btn" id="mode-5" onclick="setMode(5)">5</button>
-  <button class="mode-btn" id="mode-6" onclick="setMode(6)">6</button>
+  <div class="mode-bar-row">
+    <span class="mode-label">Guess:</span>
+    <button class="guess-btn active-hex" id="guess-hex"  onclick="setGuessMode('hex')">HEX</button>
+    <button class="guess-btn"            id="guess-name" onclick="setGuessMode('name')">NAME</button>
+  </div>
+  <div class="mode-bar-row" id="hex-mode-row">
+    <span class="mode-label">Missing:</span>
+    <button class="mode-btn active" id="mode-1" onclick="setMode(1)">1</button>
+    <button class="mode-btn"        id="mode-2" onclick="setMode(2)">2</button>
+    <button class="mode-btn"        id="mode-3" onclick="setMode(3)">3</button>
+    <button class="mode-btn"        id="mode-4" onclick="setMode(4)">4</button>
+    <button class="mode-btn"        id="mode-5" onclick="setMode(5)">5</button>
+    <button class="mode-btn"        id="mode-6" onclick="setMode(6)">6</button>
+  </div>
+  <div class="mode-bar-row" id="name-mode-row" style="display:none;">
+    <span class="mode-label">Hide:</span>
+    <span style="font-family:var(--mono);font-size:clamp(9px,2.2vw,11px);color:var(--text-dim);letter-spacing:1px;">RANDOM L/R</span>
+    <div class="toggle-wrap" id="bothToggle" onclick="toggleBothMode()" title="Always hide full name">
+      <span class="toggle-label">BOTH</span>
+      <div class="toggle-track"><div class="toggle-thumb"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="colorModal" onclick="handleBackdropClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">COLOR LIST</div>
+      <button class="modal-close" onclick="closeColorList()">&#x2715;</button>
+    </div>
+    <div class="modal-stats">
+      <div class="modal-stat"><div class="stat-dot correct"></div><span id="statCorrect">0 correct</span></div>
+      <div class="modal-stat"><div class="stat-dot wrong"></div><span id="statWrong">0 incorrect</span></div>
+      <div class="modal-stat"><div class="stat-dot unseen"></div><span id="statUnseen">103 unseen</span></div>
+    </div>
+    <div class="modal-list" id="colorList"></div>
+  </div>
 </div>
 
 <script>
@@ -722,7 +381,7 @@ const COLORS = [
   {hex:'C0C0C0',name:'Silver (W3C)'},{hex:'C9C1C1',name:'Steampunk'},
   {hex:'C9C0BB',name:'Pale Silver'},{hex:'C0C6C7',name:'Gear Steel Gray'},
   {hex:'D1D0CE',name:'Gray Goose'},{hex:'CECECE',name:'Platinum Silver'},
-  {hex:'D3D3D3',name:'LightGray (W3C)'},{hex:'DADBD D',name:'Silver White'},
+  {hex:'D3D3D3',name:'LightGray (W3C)'},{hex:'DADBD0',name:'Silver White'},
   {hex:'DCDCDC',name:'Gainsboro (W3C)'},{hex:'E0E5E5',name:'Light Steel Gray'},
   {hex:'F5F5F5',name:'WhiteSmoke (W3C)'},{hex:'EEEEEE',name:'White Gray'},
   {hex:'E5E4E2',name:'Platinum'},{hex:'BCC6CC',name:'Metallic Silver'},
@@ -742,38 +401,32 @@ const COLORS = [
   {hex:'151B8D',name:'Denim Dark Blue'},{hex:'00008B',name:'DarkBlue (W3C)'},
   {hex:'15317E',name:'Lapis Blue'},{hex:'0000A0',name:'New Midnight Blue'},
   {hex:'0000A5',name:'Earth Blue'},
-  {hex:'FF0000',name:'Red'},
-  {hex:'FFFFFF',name:'White'},
-  {hex:'00FFFF',name:'Cyan'},
-  {hex:'0000FF',name:'Blue'},
-  {hex:'ADD8E6',name:'Light Blue'},
-  {hex:'FFA500',name:'Orange'},
-  {hex:'800080',name:'Purple'},
-  {hex:'A52A2A',name:'Brown'},
-  {hex:'FFFF00',name:'Yellow'},
-  {hex:'800000',name:'Maroon'},
-  {hex:'00FF00',name:'Lime'},
-  {hex:'008000',name:'Green'},
-  {hex:'FF00FF',name:'Magenta'},
-  {hex:'808000',name:'Olive'},
-  {hex:'FFC0CB',name:'Pink'},
-  {hex:'7FFFD4',name:'Aquamarine'}
+  {hex:'FF0000',name:'Red'},{hex:'FFFFFF',name:'White'},
+  {hex:'00FFFF',name:'Cyan'},{hex:'0000FF',name:'Blue'},
+  {hex:'ADD8E6',name:'Light Blue'},{hex:'FFA500',name:'Orange'},
+  {hex:'800080',name:'Purple'},{hex:'A52A2A',name:'Brown'},
+  {hex:'FFFF00',name:'Yellow'},{hex:'800000',name:'Maroon'},
+  {hex:'00FF00',name:'Lime'},{hex:'008000',name:'Green'},
+  {hex:'FF00FF',name:'Magenta'},{hex:'808000',name:'Olive'},
+  {hex:'FFC0CB',name:'Pink'},{hex:'7FFFD4',name:'Aquamarine'}
 ];
 
-// Fix the typo in source data
-COLORS.forEach(c => { c.hex = c.hex.replace(/\s/g, ''); });
+// ── STATE ──
+let currentMode       = 1;
+let currentColor      = null;
+let missingPositions  = [];
+let gameState         = 'playing';
+let streak            = 0;
+let colorQueue        = [];
+let autoAdvance       = true;
+let autoAdvanceTimer  = null;
+let guessMode         = 'hex';
+let bothModeOn        = false;
+let currentNameSide   = 'left';
+let currentHiddenPart = '';
+const colorHistory    = {};
 
-let currentMode = 1;
-let currentColor = null;
-let missingPositions = [];
-let gameState = 'playing';
-let streak = 0;
-let colorQueue = [];
-let autoAdvance = true;
-let autoAdvanceTimer = null;
-// Tracks result per color hex: 'correct' | 'wrong'
-const colorHistory = {};
-
+// ── UTILS ──
 function shuffleArray(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -782,70 +435,92 @@ function shuffleArray(arr) {
   }
   return a;
 }
-
 function getNextColor() {
-  if (colorQueue.length === 0) colorQueue = shuffleArray(COLORS);
+  if (!colorQueue.length) colorQueue = shuffleArray(COLORS);
   return colorQueue.pop();
 }
-
 function getRandomPositions(count) {
-  const positions = [0,1,2,3,4,5];
-  const shuffled = shuffleArray(positions);
-  return shuffled.slice(0, count).sort((a,b) => a-b);
+  return shuffleArray([0,1,2,3,4,5]).slice(0, count).sort((a,b) => a - b);
 }
 
+// ── CONTROLS ──
 function setMode(m) {
   currentMode = m;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(`mode-${m}`).classList.add('active');
+  document.getElementById('mode-' + m).classList.add('active');
+  newRound();
+}
+function setGuessMode(mode) {
+  guessMode = mode;
+  document.getElementById('guess-hex').className  = 'guess-btn' + (mode === 'hex'  ? ' active-hex'  : '');
+  document.getElementById('guess-name').className = 'guess-btn' + (mode === 'name' ? ' active-name' : '');
+  document.getElementById('hex-mode-row').style.display  = mode === 'hex'  ? '' : 'none';
+  document.getElementById('name-mode-row').style.display = mode === 'name' ? '' : 'none';
+  newRound();
+}
+function toggleAutoAdvance() {
+  autoAdvance = !autoAdvance;
+  document.getElementById('autoToggle').classList.toggle('on', autoAdvance);
+  if (!autoAdvance && autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
+}
+function toggleBothMode() {
+  bothModeOn = !bothModeOn;
+  document.getElementById('bothToggle').classList.toggle('on', bothModeOn);
   newRound();
 }
 
+// ── ROUND ──
 function newRound() {
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null; }
   currentColor = getNextColor();
-  missingPositions = getRandomPositions(currentMode);
+  if (guessMode === 'hex') missingPositions = getRandomPositions(currentMode);
   gameState = 'playing';
   render();
 }
+function skipRound() {
+  streak = 0; updateStreak();
+  newRound();
+}
 
+// ── RENDER ──
 function render() {
   const c = currentColor;
-  // Swatch
-  const swatch = document.getElementById('swatch');
-  swatch.style.backgroundColor = '#' + c.hex;
-
-  // Color info
-  document.getElementById('colorName').textContent = c.name.toUpperCase();
+  document.getElementById('swatch').style.backgroundColor = '#' + c.hex;
   document.getElementById('colorIndex').textContent =
-    `Color ${COLORS.indexOf(c)+1} of ${COLORS.length} · Mode ${currentMode} ↗`;
+    'Color ' + (COLORS.indexOf(c)+1) + ' of ' + COLORS.length +
+    ' \u00b7 ' + (guessMode === 'hex' ? 'Mode ' + currentMode : 'Name \u00b7 ' + (bothModeOn ? 'BOTH' : 'RANDOM')) + ' \u2197';
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('btnRow').innerHTML =
+    '<button class="btn btn-skip" onclick="skipRound()">SKIP</button>' +
+    '<button class="btn btn-enter" onclick="checkAnswer()">ENTER</button>';
+  if (guessMode === 'hex') renderHex(c);
+  else renderName(c);
+}
 
-  // Hex chars
+function renderHex(c) {
+  document.getElementById('colorName').textContent = c.name.toUpperCase();
+  document.getElementById('hexDisplay').style.display = '';
+  document.getElementById('nameGuessWrap').style.display = 'none';
+
   const hexChars = document.getElementById('hexChars');
   hexChars.innerHTML = '';
   for (let i = 0; i < 6; i++) {
     if (missingPositions.includes(i)) {
       const inp = document.createElement('input');
-      inp.type = 'text';
-      inp.maxLength = 1;
-      inp.className = 'hex-input';
-      inp.id = `inp-${i}`;
-      inp.autocomplete = 'off';
-      inp.spellcheck = false;
-      inp.setAttribute('data-pos', i);
-
-      inp.addEventListener('input', e => {
-        let v = e.target.value.replace(/[^0-9a-fA-F]/g, '');
+      inp.type = 'text'; inp.maxLength = 1; inp.className = 'hex-input';
+      inp.id = 'inp-' + i; inp.autocomplete = 'off'; inp.spellcheck = false;
+      inp.addEventListener('input', (function(idx){ return function(e) {
+        const v = e.target.value.replace(/[^0-9a-fA-F]/g, '');
         e.target.value = v.slice(-1).toUpperCase();
-        if (v) advanceFocus(i);
-      });
-      inp.addEventListener('keydown', e => {
+        if (v) advanceFocus(idx);
+      }; })(i));
+      inp.addEventListener('keydown', (function(idx){ return function(e) {
         if (e.key === 'Enter') checkAnswer();
-        if (e.key === 'Backspace' && !e.target.value) retreatFocus(i);
-        if (e.key === 'ArrowLeft') retreatFocus(i);
-        if (e.key === 'ArrowRight') advanceFocus(i);
-      });
-      inp.addEventListener('focus', e => e.target.select());
+        if (e.key === 'Backspace' && !e.target.value) retreatFocus(idx);
+        if (e.key === 'ArrowLeft')  retreatFocus(idx);
+        if (e.key === 'ArrowRight') advanceFocus(idx);
+      }; })(i));
+      inp.addEventListener('focus', function(e){ e.target.select(); });
       hexChars.appendChild(inp);
     } else {
       const span = document.createElement('div');
@@ -854,222 +529,212 @@ function render() {
       hexChars.appendChild(span);
     }
   }
-
-  // Feedback reset
-  const feedback = document.getElementById('feedback');
-  feedback.className = 'feedback';
-
-  // Button row
-  const btnRow = document.getElementById('btnRow');
-  btnRow.innerHTML = `
-    <button class="btn btn-skip" onclick="skipRound()">SKIP</button>
-    <button class="btn btn-enter" id="btnEnter" onclick="checkAnswer()">ENTER</button>
-  `;
-
-  // Focus first input
-  setTimeout(() => {
-    const first = document.getElementById(`inp-${missingPositions[0]}`);
-    if (first) first.focus();
-  }, 50);
+  document.getElementById('hintText').innerHTML = 'Type in the <kbd>_</kbd> blanks &middot; <kbd>Enter</kbd> to submit';
+  setTimeout(function(){ const el = document.getElementById('inp-' + missingPositions[0]); if (el) el.focus(); }, 50);
 }
 
-function advanceFocus(currentPos) {
-  const next = missingPositions.find(p => p > currentPos);
-  if (next !== undefined) {
-    document.getElementById(`inp-${next}`)?.focus();
+function renderName(c) {
+  document.getElementById('colorName').textContent = '';
+  document.getElementById('hexDisplay').style.display = 'none';
+
+  const ng = document.getElementById('nameGuessWrap');
+  ng.style.display = '';
+
+  const parts = getNameParts(c.name);
+  currentHiddenPart = parts.hidden;
+
+  var inputHTML = '<input class="name-input" id="nameInput" type="text" placeholder="???" autocomplete="off" spellcheck="false">';
+  var visibleHTML = parts.shown ? '<span class="name-visible">' + parts.shown.toUpperCase() + '</span>' : '';
+
+  ng.innerHTML =
+    '<div class="name-parts">' +
+      (parts.hiddenFirst ? inputHTML + visibleHTML : visibleHTML + inputHTML) +
+    '</div>' +
+    '<div class="hex-full">' +
+      '<div class="hex-full-hash">#</div>' +
+      '<div class="hex-full-value">' + c.hex.toUpperCase() + '</div>' +
+    '</div>';
+
+  var inp = document.getElementById('nameInput');
+  inp.addEventListener('keydown', function(e){ if (e.key === 'Enter') checkAnswer(); });
+  document.getElementById('hintText').innerHTML = 'Type the missing name &middot; <kbd>Enter</kbd> to submit';
+  setTimeout(function(){ inp.focus(); }, 50);
+}
+
+function getNameParts(name) {
+  const words = name.split(' ');
+  if (words.length === 1 || bothModeOn) {
+    currentNameSide = 'both';
+    return { hidden: name, shown: '', hiddenFirst: true };
+  }
+  currentNameSide = Math.random() < 0.5 ? 'left' : 'right';
+  const mid = Math.ceil(words.length / 2);
+  if (currentNameSide === 'left') {
+    return { hidden: words.slice(0, mid).join(' '), shown: words.slice(mid).join(' '), hiddenFirst: true };
+  } else {
+    return { hidden: words.slice(mid).join(' '), shown: words.slice(0, mid).join(' '), hiddenFirst: false };
   }
 }
-function retreatFocus(currentPos) {
-  const prev = [...missingPositions].reverse().find(p => p < currentPos);
-  if (prev !== undefined) {
-    document.getElementById(`inp-${prev}`)?.focus();
-  }
-}
 
-function allFilled() {
-  return missingPositions.every(p => {
-    const inp = document.getElementById(`inp-${p}`);
-    return inp && inp.value.trim().length === 1;
+// ── FOCUS HELPERS ──
+function advanceFocus(pos) {
+  const next = missingPositions.find(function(p){ return p > pos; });
+  if (next !== undefined) { var el = document.getElementById('inp-' + next); if (el) el.focus(); }
+}
+function retreatFocus(pos) {
+  const prev = missingPositions.slice().reverse().find(function(p){ return p < pos; });
+  if (prev !== undefined) { var el = document.getElementById('inp-' + prev); if (el) el.focus(); }
+}
+function allHexFilled() {
+  return missingPositions.every(function(p){
+    var el = document.getElementById('inp-' + p);
+    return el && el.value.trim().length === 1;
   });
 }
 
+// ── CHECK ──
 function checkAnswer() {
   if (gameState === 'revealed') { newRound(); return; }
-  if (!allFilled()) {
-    showFeedback('wrong', 'Fill in all missing characters first!');
-    return;
-  }
+  if (guessMode === 'hex') checkHexAnswer();
+  else checkNameAnswer();
+}
 
-  let allCorrect = true;
-  missingPositions.forEach(pos => {
-    const inp = document.getElementById(`inp-${pos}`);
-    const val = inp.value.toUpperCase();
-    const correct = currentColor.hex[pos].toUpperCase();
-    if (val === correct) {
-      inp.classList.add('correct');
-    } else {
-      inp.classList.add('wrong');
-      allCorrect = false;
-    }
+function checkHexAnswer() {
+  if (!allHexFilled()) { showFeedback('wrong', 'Fill in all blanks first!'); return; }
+  var allCorrect = true;
+  missingPositions.forEach(function(pos) {
+    var inp = document.getElementById('inp-' + pos);
+    var ok = inp.value.toUpperCase() === currentColor.hex[pos].toUpperCase();
+    inp.classList.add(ok ? 'correct' : 'wrong');
+    if (!ok) allCorrect = false;
   });
-
   if (allCorrect) {
-    streak++;
-    updateStreak();
+    streak++; updateStreak();
     colorHistory[currentColor.hex] = 'correct';
-    showFeedback('correct', `Correct! #${currentColor.hex.toUpperCase()}`);
-    document.getElementById('btnRow').innerHTML = `
-      <button class="btn btn-skip" onclick="skipRound()">SKIP</button>
-      <button class="btn btn-next" onclick="newRound()">NEXT →</button>
-    `;
-    if (autoAdvance) {
-      autoAdvanceTimer = setTimeout(() => { newRound(); }, 4000);
-    }
+    showFeedback('correct', 'Correct! #' + currentColor.hex.toUpperCase());
+    document.getElementById('btnRow').innerHTML =
+      '<button class="btn btn-skip" onclick="skipRound()">SKIP</button>' +
+      '<button class="btn btn-next" onclick="newRound()">NEXT \u2192</button>';
+    if (autoAdvance) autoAdvanceTimer = setTimeout(newRound, 4000);
   } else {
-    streak = 0;
-    updateStreak();
+    streak = 0; updateStreak();
     colorHistory[currentColor.hex] = 'wrong';
     gameState = 'revealed';
-    showFeedback('wrong', `Incorrect — the answer was #${currentColor.hex.toUpperCase()}`);
-    // Reveal correct chars in wrong inputs
-    missingPositions.forEach(pos => {
-      const inp = document.getElementById(`inp-${pos}`);
+    showFeedback('wrong', 'Incorrect \u2014 answer was #' + currentColor.hex.toUpperCase());
+    missingPositions.forEach(function(pos) {
+      var inp = document.getElementById('inp-' + pos);
       if (inp.classList.contains('wrong')) {
         inp.value = currentColor.hex[pos].toUpperCase();
-        inp.classList.remove('wrong');
-        inp.classList.add('revealed');
-        inp.readOnly = true;
+        inp.classList.remove('wrong'); inp.classList.add('revealed');
       }
       inp.readOnly = true;
     });
-    document.getElementById('btnRow').innerHTML = `
-      <button class="btn btn-skip" onclick="skipRound()">SKIP</button>
-      <button class="btn btn-next" onclick="newRound()">PROCEED →</button>
-    `;
+    document.getElementById('btnRow').innerHTML =
+      '<button class="btn btn-skip" onclick="skipRound()">SKIP</button>' +
+      '<button class="btn btn-next" onclick="newRound()">PROCEED \u2192</button>';
   }
 }
 
-function skipRound() {
-  streak = 0;
-  updateStreak();
-  newRound();
+function checkNameAnswer() {
+  var inp = document.getElementById('nameInput');
+  if (!inp || !inp.value.trim()) { showFeedback('wrong', 'Type the missing name first!'); return; }
+  var isCorrect = inp.value.trim().toLowerCase() === currentHiddenPart.toLowerCase();
+  if (isCorrect) {
+    streak++; updateStreak();
+    colorHistory[currentColor.hex] = 'correct';
+    inp.classList.add('correct'); inp.readOnly = true;
+    showFeedback('correct', 'Correct! "' + currentColor.name + '"');
+    document.getElementById('btnRow').innerHTML =
+      '<button class="btn btn-skip" onclick="skipRound()">SKIP</button>' +
+      '<button class="btn btn-next" onclick="newRound()">NEXT \u2192</button>';
+    if (autoAdvance) autoAdvanceTimer = setTimeout(newRound, 4000);
+  } else {
+    streak = 0; updateStreak();
+    colorHistory[currentColor.hex] = 'wrong';
+    gameState = 'revealed';
+    inp.classList.add('wrong'); inp.readOnly = true;
+    showFeedback('wrong', 'Incorrect \u2014 it was "' + currentColor.name + '"');
+    setTimeout(function(){
+      inp.classList.remove('wrong'); inp.classList.add('revealed');
+      inp.value = currentHiddenPart;
+    }, 600);
+    document.getElementById('btnRow').innerHTML =
+      '<button class="btn btn-skip" onclick="skipRound()">SKIP</button>' +
+      '<button class="btn btn-next" onclick="newRound()">PROCEED \u2192</button>';
+  }
 }
 
+// ── UI HELPERS ──
 function showFeedback(type, msg) {
-  const fb = document.getElementById('feedback');
-  const ft = document.getElementById('feedbackText');
-  fb.className = `feedback show ${type === 'correct' ? 'correct-msg' : 'wrong-msg'}`;
-  ft.textContent = msg;
+  var fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (type === 'correct' ? 'correct-msg' : 'wrong-msg');
+  document.getElementById('feedbackText').textContent = msg;
 }
-
 function updateStreak() {
-  const el = document.getElementById('streak');
+  var el = document.getElementById('streak');
   el.textContent = streak;
   el.classList.remove('pop');
-  void el.offsetWidth; // reflow
+  void el.offsetWidth;
   el.classList.add('pop');
 }
 
-// Global enter key
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    const active = document.activeElement;
-    if (!active || !active.classList.contains('hex-input')) {
-      if (gameState === 'revealed') newRound();
-    }
-  }
-});
-
-function toggleAutoAdvance() {
-  autoAdvance = !autoAdvance;
-  const el = document.getElementById('autoToggle');
-  el.classList.toggle('on', autoAdvance);
-  // If turning off while a timer is pending, cancel it
-  if (!autoAdvance && autoAdvanceTimer) {
-    clearTimeout(autoAdvanceTimer);
-    autoAdvanceTimer = null;
-  }
-}
-
+// ── MODAL ──
 function openColorList() {
   buildColorList();
   document.getElementById('colorModal').classList.add('open');
   document.body.style.overflow = 'hidden';
-  // Scroll to current color
-  setTimeout(() => {
-    const cur = document.getElementById('modal-row-' + currentColor.hex);
-    if (cur) cur.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  setTimeout(function(){
+    var row = document.getElementById('modal-row-' + currentColor.hex);
+    if (row) row.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }, 80);
 }
-
 function closeColorList() {
   document.getElementById('colorModal').classList.remove('open');
   document.body.style.overflow = '';
 }
-
 function handleBackdropClick(e) {
   if (e.target === document.getElementById('colorModal')) closeColorList();
 }
-
 function buildColorList() {
-  const list = document.getElementById('colorList');
+  var list = document.getElementById('colorList');
   list.innerHTML = '';
-  let nCorrect = 0, nWrong = 0, nUnseen = 0;
-
-  COLORS.forEach((c, i) => {
-    const status = colorHistory[c.hex] || 'unseen';
-    const isCurrent = currentColor && c.hex === currentColor.hex;
-    if (status === 'correct') nCorrect++;
-    else if (status === 'wrong') nWrong++;
-    else nUnseen++;
-
-    const row = document.createElement('div');
+  var nC = 0, nW = 0, nU = 0;
+  COLORS.forEach(function(c, i) {
+    var status = colorHistory[c.hex] || 'unseen';
+    var isCurrent = currentColor && c.hex === currentColor.hex;
+    if (status === 'correct') nC++;
+    else if (status === 'wrong') nW++;
+    else nU++;
+    var badgeLabel = isCurrent ? 'NOW' : (status === 'unseen' ? '' : status.toUpperCase());
+    var badgeClass = isCurrent ? 'current' : status;
+    var row = document.createElement('div');
     row.className = 'color-row' + (isCurrent ? ' current-row' : '');
     row.id = 'modal-row-' + c.hex;
-
-    const badgeLabel = isCurrent ? 'NOW' : (status === 'unseen' ? '' : status.toUpperCase());
-    const badgeClass = isCurrent ? 'current' : status;
-
-    row.innerHTML = `
-      <div class="row-num">${i+1}</div>
-      <div class="row-swatch" style="background:#${c.hex}"></div>
-      <div class="row-info">
-        <div class="row-name">${c.name}</div>
-        <div class="row-hex">#${c.hex.toUpperCase()}</div>
-      </div>
-      <div class="row-badge ${badgeClass}">${badgeLabel}</div>
-    `;
+    row.innerHTML =
+      '<div class="row-num">' + (i+1) + '</div>' +
+      '<div class="row-swatch" style="background:#' + c.hex + '"></div>' +
+      '<div class="row-info">' +
+        '<div class="row-name">' + c.name + '</div>' +
+        '<div class="row-hex">#' + c.hex.toUpperCase() + '</div>' +
+      '</div>' +
+      '<div class="row-badge ' + badgeClass + '">' + badgeLabel + '</div>';
     list.appendChild(row);
   });
-
-  document.getElementById('statCorrect').textContent = `${nCorrect} correct`;
-  document.getElementById('statWrong').textContent   = `${nWrong} incorrect`;
-  document.getElementById('statUnseen').textContent  = `${nUnseen} unseen`;
+  document.getElementById('statCorrect').textContent = nC + ' correct';
+  document.getElementById('statWrong').textContent   = nW + ' incorrect';
+  document.getElementById('statUnseen').textContent  = nU + ' unseen';
 }
 
-// Close modal on Escape
-document.addEventListener('keydown', e => {
+document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeColorList();
+  if (e.key === 'Enter') {
+    var active = document.activeElement;
+    if (active && (active.classList.contains('hex-input') || active.classList.contains('name-input'))) return;
+    if (gameState === 'revealed') newRound();
+  }
 });
 
-// Start
 newRound();
 </script>
-<!-- COLOR LIST MODAL -->
-<div class="modal-backdrop" id="colorModal" onclick="handleBackdropClick(event)">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">COLOR LIST</div>
-      <button class="modal-close" onclick="closeColorList()">✕</button>
-    </div>
-    <div class="modal-stats">
-      <div class="modal-stat"><div class="stat-dot correct"></div><span id="statCorrect">0 correct</span></div>
-      <div class="modal-stat"><div class="stat-dot wrong"></div><span id="statWrong">0 incorrect</span></div>
-      <div class="modal-stat"><div class="stat-dot unseen"></div><span id="statUnseen">103 unseen</span></div>
-    </div>
-    <div class="modal-list" id="colorList"></div>
-  </div>
-</div>
-
 </body>
 </html>

@@ -494,6 +494,158 @@
     .card-body { flex: 1; padding: 14px 16px; }
     .color-index { margin-bottom: 10px; }
   }
+  /* ── COLOR LIST MODAL ── */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.72);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
+  }
+  .modal-backdrop.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .modal {
+    width: 100%;
+    max-width: 520px;
+    max-height: 82vh;
+    background: var(--surface);
+    border: 1px solid var(--border-lit);
+    border-radius: clamp(10px, 3vw, 16px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+    transform: translateY(16px);
+    transition: transform 0.22s cubic-bezier(0.22,1,0.36,1);
+  }
+  .modal-backdrop.open .modal {
+    transform: translateY(0);
+  }
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .modal-title {
+    font-family: var(--display);
+    font-size: clamp(16px, 4vw, 20px);
+    letter-spacing: 2px;
+    color: var(--text);
+  }
+  .modal-close {
+    width: 30px; height: 30px;
+    border-radius: 6px;
+    border: 1px solid var(--border-lit);
+    background: transparent;
+    color: var(--text-dim);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    line-height: 1;
+    touch-action: manipulation;
+  }
+  .modal-close:hover { border-color: var(--wrong); color: var(--wrong); }
+  .modal-stats {
+    display: flex;
+    gap: 16px;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .modal-stat {
+    font-family: var(--mono);
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-dim);
+  }
+  .stat-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .stat-dot.unseen  { background: var(--border-lit); }
+  .stat-dot.correct { background: var(--correct); }
+  .stat-dot.wrong   { background: var(--wrong); }
+  .modal-list {
+    overflow-y: auto;
+    flex: 1;
+    padding: 8px 12px 12px;
+    overscroll-behavior: contain;
+  }
+  .modal-list::-webkit-scrollbar { width: 4px; }
+  .modal-list::-webkit-scrollbar-track { background: transparent; }
+  .modal-list::-webkit-scrollbar-thumb { background: var(--border-lit); border-radius: 2px; }
+  .color-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    transition: background 0.12s;
+  }
+  .color-row:hover { background: rgba(255,255,255,0.03); }
+  .color-row.current-row { background: rgba(61,158,255,0.07); border: 1px solid rgba(61,158,255,0.2); }
+  .row-swatch {
+    width: 28px; height: 28px;
+    border-radius: 5px;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .row-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .row-name {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .row-hex {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 1px;
+  }
+  .row-badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .row-badge.correct { background: var(--correct-glow); color: var(--correct); border: 1px solid var(--correct); }
+  .row-badge.wrong   { background: var(--wrong-glow);   color: var(--wrong);   border: 1px solid var(--wrong); }
+  .row-badge.current { background: var(--accent-glow);  color: var(--accent);  border: 1px solid var(--accent); }
+  .row-badge.unseen  { display: none; }
+  .row-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    width: 24px;
+    text-align: right;
+    flex-shrink: 0;
+  }
 </style>
 </head>
 <body>
@@ -512,7 +664,9 @@
     <div class="swatch" id="swatch"></div>
     <div class="card-body">
       <div class="color-name" id="colorName">—</div>
-      <div class="color-index" id="colorIndex">Color 0 of 85</div>
+      <div class="color-index" id="colorIndex" onclick="openColorList()"
+        style="cursor:pointer; text-decoration:underline; text-decoration-style:dotted; text-underline-offset:3px;"
+        title="View all colors">Color 0 of 103 ↗</div>
       <div class="hex-display">
         <div class="hex-hash">#</div>
         <div class="hex-chars" id="hexChars"></div>
@@ -617,6 +771,8 @@ let streak = 0;
 let colorQueue = [];
 let autoAdvance = true;
 let autoAdvanceTimer = null;
+// Tracks result per color hex: 'correct' | 'wrong'
+const colorHistory = {};
 
 function shuffleArray(arr) {
   const a = [...arr];
@@ -662,7 +818,7 @@ function render() {
   // Color info
   document.getElementById('colorName').textContent = c.name.toUpperCase();
   document.getElementById('colorIndex').textContent =
-    `Color ${COLORS.indexOf(c)+1} of ${COLORS.length} · Mode ${currentMode}`;
+    `Color ${COLORS.indexOf(c)+1} of ${COLORS.length} · Mode ${currentMode} ↗`;
 
   // Hex chars
   const hexChars = document.getElementById('hexChars');
@@ -760,6 +916,7 @@ function checkAnswer() {
   if (allCorrect) {
     streak++;
     updateStreak();
+    colorHistory[currentColor.hex] = 'correct';
     showFeedback('correct', `Correct! #${currentColor.hex.toUpperCase()}`);
     document.getElementById('btnRow').innerHTML = `
       <button class="btn btn-skip" onclick="skipRound()">SKIP</button>
@@ -771,6 +928,7 @@ function checkAnswer() {
   } else {
     streak = 0;
     updateStreak();
+    colorHistory[currentColor.hex] = 'wrong';
     gameState = 'revealed';
     showFeedback('wrong', `Incorrect — the answer was #${currentColor.hex.toUpperCase()}`);
     // Reveal correct chars in wrong inputs
@@ -833,8 +991,85 @@ function toggleAutoAdvance() {
   }
 }
 
+function openColorList() {
+  buildColorList();
+  document.getElementById('colorModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Scroll to current color
+  setTimeout(() => {
+    const cur = document.getElementById('modal-row-' + currentColor.hex);
+    if (cur) cur.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }, 80);
+}
+
+function closeColorList() {
+  document.getElementById('colorModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleBackdropClick(e) {
+  if (e.target === document.getElementById('colorModal')) closeColorList();
+}
+
+function buildColorList() {
+  const list = document.getElementById('colorList');
+  list.innerHTML = '';
+  let nCorrect = 0, nWrong = 0, nUnseen = 0;
+
+  COLORS.forEach((c, i) => {
+    const status = colorHistory[c.hex] || 'unseen';
+    const isCurrent = currentColor && c.hex === currentColor.hex;
+    if (status === 'correct') nCorrect++;
+    else if (status === 'wrong') nWrong++;
+    else nUnseen++;
+
+    const row = document.createElement('div');
+    row.className = 'color-row' + (isCurrent ? ' current-row' : '');
+    row.id = 'modal-row-' + c.hex;
+
+    const badgeLabel = isCurrent ? 'NOW' : (status === 'unseen' ? '' : status.toUpperCase());
+    const badgeClass = isCurrent ? 'current' : status;
+
+    row.innerHTML = `
+      <div class="row-num">${i+1}</div>
+      <div class="row-swatch" style="background:#${c.hex}"></div>
+      <div class="row-info">
+        <div class="row-name">${c.name}</div>
+        <div class="row-hex">#${c.hex.toUpperCase()}</div>
+      </div>
+      <div class="row-badge ${badgeClass}">${badgeLabel}</div>
+    `;
+    list.appendChild(row);
+  });
+
+  document.getElementById('statCorrect').textContent = `${nCorrect} correct`;
+  document.getElementById('statWrong').textContent   = `${nWrong} incorrect`;
+  document.getElementById('statUnseen').textContent  = `${nUnseen} unseen`;
+}
+
+// Close modal on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeColorList();
+});
+
 // Start
 newRound();
 </script>
+<!-- COLOR LIST MODAL -->
+<div class="modal-backdrop" id="colorModal" onclick="handleBackdropClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">COLOR LIST</div>
+      <button class="modal-close" onclick="closeColorList()">✕</button>
+    </div>
+    <div class="modal-stats">
+      <div class="modal-stat"><div class="stat-dot correct"></div><span id="statCorrect">0 correct</span></div>
+      <div class="modal-stat"><div class="stat-dot wrong"></div><span id="statWrong">0 incorrect</span></div>
+      <div class="modal-stat"><div class="stat-dot unseen"></div><span id="statUnseen">103 unseen</span></div>
+    </div>
+    <div class="modal-list" id="colorList"></div>
+  </div>
+</div>
+
 </body>
 </html>
